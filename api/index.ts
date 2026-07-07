@@ -1,9 +1,16 @@
 import express from "express";
 import { GoogleGenAI } from "@google/genai";
-import { kv } from "@vercel/kv";
+import { createClient } from "@supabase/supabase-js";
 
 const app = express();
 app.use(express.json());
+
+// Initialize Supabase Client
+const supabaseUrl = process.env.SUPABASE_URL || "";
+const supabaseKey = process.env.SUPABASE_ANON_KEY || "";
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: { persistSession: false },
+});
 
 // In-memory session validasi
 const activeSessions = new Map<string, { userId: string; username: string }>();
@@ -33,7 +40,7 @@ function getAIClient() {
   return aiClient;
 }
 
-// --- API ROUTES (VERCEL KV) ---
+// --- API ROUTES (SUPABASE) ---
 
 // Auth: Register
 app.post("/api/auth/register", async (req, res) => {
@@ -42,12 +49,21 @@ app.post("/api/auth/register", async (req, res) => {
     return res.status(400).json({ success: false, message: "Username dan password wajib diisi." });
   }
 
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(500).json({ success: false, message: "Error: SUPABASE_URL atau SUPABASE_ANON_KEY belum diatur di Vercel." });
+  }
+
   try {
     const cleanUsername = username.trim().toLowerCase();
     
-    // Check if user exists in KV
-    const existingUser = await kv.hgetall(`user:${cleanUsername}`);
-    if (existingUser && Object.keys(existingUser).length > 0) {
+    // Check if user exists
+    const { data: existingUser, error: checkError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('username', cleanUsername)
+      .single();
+
+    if (existingUser) {
       return res.status(400).json({ success: false, message: "Username sudah terdaftar." });
     }
 
@@ -67,15 +83,19 @@ app.post("/api/auth/register", async (req, res) => {
       focusTarget: 4,
     };
 
-    // Save to Vercel KV
-    await kv.hset(`user:${cleanUsername}`, newUser);
-    // Maintain a reverse lookup for user ID to username (needed for session/profile fetching)
-    await kv.set(`uid:${userId}`, cleanUsername);
+    const { error: insertError } = await supabase
+      .from('users')
+      .insert([newUser]);
+
+    if (insertError) {
+      console.error("Supabase Insert Error:", insertError);
+      return res.status(500).json({ success: false, message: `Error Database: ${insertError.message}` });
+    }
 
     res.status(201).json({ success: true, message: "Registrasi berhasil! Silakan masuk." });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Register Error:", error);
-    res.status(500).json({ success: false, message: "Terjadi kesalahan server saat mendaftar." });
+    res.status(500).json({ success: false, message: `Terjadi kesalahan server: ${error.message}` });
   }
 });
 
@@ -86,11 +106,21 @@ app.post("/api/auth/login", async (req, res) => {
     return res.status(400).json({ success: false, message: "Username dan password wajib diisi." });
   }
 
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(500).json({ success: false, message: "Error: SUPABASE_URL atau SUPABASE_ANON_KEY belum diatur di Vercel." });
+  }
+
   try {
     const cleanUsername = username.trim().toLowerCase();
-    const user = await kv.hgetall(`user:${cleanUsername}`) as any;
+    
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('username', cleanUsername)
+      .eq('passwordHash', password)
+      .single();
 
-    if (!user || Object.keys(user).length === 0 || user.passwordHash !== password) {
+    if (error || !user) {
       return res.status(401).json({ success: false, message: "Username atau password salah." });
     }
 
@@ -114,9 +144,9 @@ app.post("/api/auth/login", async (req, res) => {
         focusTarget: user.focusTarget || 4,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Login Error:", error);
-    res.status(500).json({ success: false, message: "Terjadi kesalahan server saat masuk." });
+    res.status(500).json({ success: false, message: `Terjadi kesalahan server saat masuk: ${error.message}` });
   }
 });
 
@@ -143,11 +173,15 @@ app.get("/api/auth/session", async (req, res) => {
   }
   
   try {
-    const username = await kv.get(`uid:${session.userId}`);
-    if (!username) return res.status(401).json({ success: false });
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', session.userId)
+      .single();
 
-    const user = await kv.hgetall(`user:${username}`) as any;
-    if (!user) return res.status(401).json({ success: false });
+    if (error || !user) {
+      return res.status(401).json({ success: false });
+    }
     
     res.json({
       success: true,
@@ -171,35 +205,40 @@ app.get("/api/auth/session", async (req, res) => {
 
 // Auth: Update Profile
 app.put("/api/auth/profile", authMiddleware, async (req: any, res) => {
-  const { userId, username } = req.user;
+  const { userId } = req.user;
   const { fullName, email, bio, avatar, theme, language, focusTarget } = req.body;
 
   try {
-    const user = await kv.hgetall(`user:${username}`) as any;
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User tidak ditemukan." });
+    const updates: any = {};
+    if (fullName !== undefined) updates.fullName = fullName;
+    if (email !== undefined) updates.email = email;
+    if (bio !== undefined) updates.bio = bio;
+    if (avatar !== undefined) updates.avatar = avatar;
+    if (theme !== undefined) updates.theme = theme;
+    if (language !== undefined) updates.language = language;
+    if (focusTarget !== undefined) updates.focusTarget = Number(focusTarget);
+
+    const { data: user, error } = await supabase
+      .from('users')
+      .update(updates)
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error || !user) {
+      return res.status(404).json({ success: false, message: "Gagal memperbarui profil: " + (error?.message || "User tidak ditemukan.") });
     }
-
-    const updatedUser = {
-      ...user,
-      fullName: fullName !== undefined ? fullName : user.fullName,
-      email: email !== undefined ? email : user.email,
-      bio: bio !== undefined ? bio : user.bio,
-      avatar: avatar !== undefined ? avatar : user.avatar,
-      theme: theme !== undefined ? theme : user.theme,
-      language: language !== undefined ? language : user.language,
-      focusTarget: focusTarget !== undefined ? Number(focusTarget) : user.focusTarget,
-    };
-
-    await kv.hset(`user:${username}`, updatedUser);
 
     res.json({
       success: true,
       message: "Profil berhasil diperbarui.",
-      user: updatedUser,
+      user: {
+        ...user,
+        focusTarget: user.focusTarget || 4,
+      },
     });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Gagal memperbarui profil." });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: `Gagal memperbarui profil: ${error.message}` });
   }
 });
 
@@ -207,10 +246,19 @@ app.put("/api/auth/profile", authMiddleware, async (req: any, res) => {
 app.get("/api/activities", authMiddleware, async (req: any, res) => {
   const { userId } = req.user;
   try {
-    let activities: any[] = (await kv.get(`activities:${userId}`)) || [];
-    res.json({ success: true, data: activities });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Gagal mengambil aktivitas." });
+    const { data: activities, error } = await supabase
+      .from('activities')
+      .select('*')
+      .eq('userId', userId)
+      .order('createdAt', { ascending: true });
+
+    if (error) {
+      return res.status(500).json({ success: false, message: `Gagal mengambil aktivitas: ${error.message}` });
+    }
+
+    res.json({ success: true, data: activities || [] });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: `Gagal mengambil aktivitas: ${error.message}` });
   }
 });
 
@@ -224,8 +272,6 @@ app.post("/api/activities", authMiddleware, async (req: any, res) => {
   }
 
   try {
-    let activities: any[] = (await kv.get(`activities:${userId}`)) || [];
-    
     const newActivity = {
       id: "act-" + Math.random().toString(36).substr(2, 9),
       userId,
@@ -239,12 +285,17 @@ app.post("/api/activities", authMiddleware, async (req: any, res) => {
       createdAt: new Date().toISOString(),
     };
 
-    activities.push(newActivity);
-    await kv.set(`activities:${userId}`, activities);
+    const { error } = await supabase
+      .from('activities')
+      .insert([newActivity]);
+
+    if (error) {
+      return res.status(500).json({ success: false, message: `Gagal membuat aktivitas: ${error.message}` });
+    }
 
     res.status(201).json({ success: true, data: newActivity });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Gagal membuat aktivitas." });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: `Gagal membuat aktivitas: ${error.message}` });
   }
 });
 
@@ -255,28 +306,30 @@ app.put("/api/activities/:id", authMiddleware, async (req: any, res) => {
   const { title, description, category, priority, startTime, endTime, isCompleted } = req.body;
 
   try {
-    let activities: any[] = (await kv.get(`activities:${userId}`)) || [];
-    const index = activities.findIndex(a => a.id === activityId);
+    const updates: any = {};
+    if (title !== undefined) updates.title = title;
+    if (description !== undefined) updates.description = description;
+    if (category !== undefined) updates.category = category;
+    if (priority !== undefined) updates.priority = priority;
+    if (startTime !== undefined) updates.startTime = startTime;
+    if (endTime !== undefined) updates.endTime = endTime;
+    if (isCompleted !== undefined) updates.isCompleted = isCompleted;
 
-    if (index === -1) {
-      return res.status(404).json({ success: false, message: "Aktivitas tidak ditemukan." });
+    const { data: activity, error } = await supabase
+      .from('activities')
+      .update(updates)
+      .eq('id', activityId)
+      .eq('userId', userId)
+      .select()
+      .single();
+
+    if (error || !activity) {
+      return res.status(404).json({ success: false, message: "Gagal memperbarui aktivitas: " + (error?.message || "Tidak ditemukan.") });
     }
 
-    const activity = activities[index];
-    if (title !== undefined) activity.title = title;
-    if (description !== undefined) activity.description = description;
-    if (category !== undefined) activity.category = category;
-    if (priority !== undefined) activity.priority = priority;
-    if (startTime !== undefined) activity.startTime = startTime;
-    if (endTime !== undefined) activity.endTime = endTime;
-    if (isCompleted !== undefined) activity.isCompleted = isCompleted;
-
-    activities[index] = activity;
-    await kv.set(`activities:${userId}`, activities);
-
     res.json({ success: true, data: activity });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Gagal memperbarui aktivitas." });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: `Gagal memperbarui aktivitas: ${error.message}` });
   }
 });
 
@@ -286,18 +339,19 @@ app.delete("/api/activities/:id", authMiddleware, async (req: any, res) => {
   const activityId = req.params.id;
 
   try {
-    let activities: any[] = (await kv.get(`activities:${userId}`)) || [];
-    const initialLen = activities.length;
-    activities = activities.filter(a => a.id !== activityId);
+    const { error } = await supabase
+      .from('activities')
+      .delete()
+      .eq('id', activityId)
+      .eq('userId', userId);
 
-    if (activities.length === initialLen) {
-      return res.status(404).json({ success: false, message: "Aktivitas tidak ditemukan." });
+    if (error) {
+      return res.status(500).json({ success: false, message: `Gagal menghapus aktivitas: ${error.message}` });
     }
 
-    await kv.set(`activities:${userId}`, activities);
     res.json({ success: true, message: "Aktivitas berhasil dihapus." });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Gagal menghapus aktivitas." });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: `Gagal menghapus aktivitas: ${error.message}` });
   }
 });
 
@@ -306,7 +360,11 @@ app.post("/api/ai/recommend", authMiddleware, async (req: any, res) => {
   const { userId } = req.user;
   
   try {
-    let userActivities: any[] = (await kv.get(`activities:${userId}`)) || [];
+    const { data: userActivities } = await supabase
+      .from('activities')
+      .select('*')
+      .eq('userId', userId);
+
     const client = getAIClient();
     if (!client) {
       return res.status(200).json({
@@ -316,7 +374,7 @@ app.post("/api/ai/recommend", authMiddleware, async (req: any, res) => {
       });
     }
 
-    const activitiesContext = userActivities.map((act, index) => {
+    const activitiesContext = (userActivities || []).map((act: any, index: number) => {
       return `${index + 1}. [${act.category}] ${act.title} - Prioritas: ${act.priority}, Status: ${act.isCompleted ? "Selesai" : "Belum"}`;
     }).join("\n");
 
@@ -337,8 +395,11 @@ app.post("/api/ai/chat", authMiddleware, async (req: any, res) => {
   const { messages } = req.body;
   
   try {
-    let userActivities: any[] = (await kv.get(`activities:${userId}`)) || [];
-    const user = await kv.hgetall(`user:${username}`) as any;
+    const { data: user } = await supabase
+      .from('users')
+      .select('fullName, username')
+      .eq('id', userId)
+      .single();
     
     const client = getAIClient();
     if (!client) {
