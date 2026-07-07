@@ -1,18 +1,13 @@
 import express from "express";
 import { GoogleGenAI } from "@google/genai";
-import connectToDatabase from "../src/db/connection";
-import { User, Activity } from "../src/db/models";
+import { kv } from "@vercel/kv";
 
 const app = express();
 app.use(express.json());
 
-// Simple token storage (in-memory simulation for session validity)
-// Note: In a real serverless app, tokens should be verified via JWT or Database,
-// as in-memory state is lost between serverless function invocations.
-// For demonstration, we keep this simple.
+// In-memory session validasi
 const activeSessions = new Map<string, { userId: string; username: string }>();
 
-// Simple authentication middleware
 const authMiddleware = (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -38,20 +33,7 @@ function getAIClient() {
   return aiClient;
 }
 
-// --- API ROUTES ---
-
-// Middleware to ensure DB connection on every request (for Serverless)
-app.use(async (req, res, next) => {
-  try {
-    await connectToDatabase();
-    next();
-  } catch (error) {
-    console.error("Database connection failed:", error);
-    // If we fail to connect (e.g. no MONGODB_URI), we proceed anyway to let routes 
-    // handle fallback or show error.
-    next();
-  }
-});
+// --- API ROUTES (VERCEL KV) ---
 
 // Auth: Register
 app.post("/api/auth/register", async (req, res) => {
@@ -62,16 +44,19 @@ app.post("/api/auth/register", async (req, res) => {
 
   try {
     const cleanUsername = username.trim().toLowerCase();
-    const userExists = await User.findOne({ username: cleanUsername });
-
-    if (userExists) {
+    
+    // Check if user exists in KV
+    const existingUser = await kv.hgetall(`user:${cleanUsername}`);
+    if (existingUser && Object.keys(existingUser).length > 0) {
       return res.status(400).json({ success: false, message: "Username sudah terdaftar." });
     }
 
-    const newUser = new User({
-      id: "user-" + Math.random().toString(36).substr(2, 9),
+    const userId = "user-" + Math.random().toString(36).substr(2, 9);
+    
+    const newUser = {
+      id: userId,
       username: cleanUsername,
-      passwordHash: password, // Simple plain text for this demo
+      passwordHash: password, // For demo purposes only
       fullName: "",
       email: "",
       bio: "",
@@ -80,9 +65,13 @@ app.post("/api/auth/register", async (req, res) => {
       theme: "dark",
       language: "id",
       focusTarget: 4,
-    });
+    };
 
-    await newUser.save();
+    // Save to Vercel KV
+    await kv.hset(`user:${cleanUsername}`, newUser);
+    // Maintain a reverse lookup for user ID to username (needed for session/profile fetching)
+    await kv.set(`uid:${userId}`, cleanUsername);
+
     res.status(201).json({ success: true, message: "Registrasi berhasil! Silakan masuk." });
   } catch (error) {
     console.error("Register Error:", error);
@@ -99,13 +88,12 @@ app.post("/api/auth/login", async (req, res) => {
 
   try {
     const cleanUsername = username.trim().toLowerCase();
-    const user = await User.findOne({ username: cleanUsername, passwordHash: password });
+    const user = await kv.hgetall(`user:${cleanUsername}`) as any;
 
-    if (!user) {
+    if (!user || Object.keys(user).length === 0 || user.passwordHash !== password) {
       return res.status(401).json({ success: false, message: "Username atau password salah." });
     }
 
-    // Generate simple token
     const token = "tok-" + Math.random().toString(36).substr(2, 15) + Math.random().toString(36).substr(2, 15);
     activeSessions.set(token, { userId: user.id, username: user.username });
 
@@ -155,10 +143,11 @@ app.get("/api/auth/session", async (req, res) => {
   }
   
   try {
-    const user = await User.findOne({ id: session.userId });
-    if (!user) {
-      return res.status(401).json({ success: false });
-    }
+    const username = await kv.get(`uid:${session.userId}`);
+    if (!username) return res.status(401).json({ success: false });
+
+    const user = await kv.hgetall(`user:${username}`) as any;
+    if (!user) return res.status(401).json({ success: false });
     
     res.json({
       success: true,
@@ -180,42 +169,34 @@ app.get("/api/auth/session", async (req, res) => {
   }
 });
 
-// Auth: Update Profile & Settings
+// Auth: Update Profile
 app.put("/api/auth/profile", authMiddleware, async (req: any, res) => {
-  const userId = req.user.userId;
+  const { userId, username } = req.user;
   const { fullName, email, bio, avatar, theme, language, focusTarget } = req.body;
 
   try {
-    const user = await User.findOne({ id: userId });
+    const user = await kv.hgetall(`user:${username}`) as any;
     if (!user) {
       return res.status(404).json({ success: false, message: "User tidak ditemukan." });
     }
 
-    if (fullName !== undefined) user.fullName = fullName;
-    if (email !== undefined) user.email = email;
-    if (bio !== undefined) user.bio = bio;
-    if (avatar !== undefined) user.avatar = avatar;
-    if (theme !== undefined) user.theme = theme;
-    if (language !== undefined) user.language = language;
-    if (focusTarget !== undefined) user.focusTarget = Number(focusTarget);
+    const updatedUser = {
+      ...user,
+      fullName: fullName !== undefined ? fullName : user.fullName,
+      email: email !== undefined ? email : user.email,
+      bio: bio !== undefined ? bio : user.bio,
+      avatar: avatar !== undefined ? avatar : user.avatar,
+      theme: theme !== undefined ? theme : user.theme,
+      language: language !== undefined ? language : user.language,
+      focusTarget: focusTarget !== undefined ? Number(focusTarget) : user.focusTarget,
+    };
 
-    await user.save();
+    await kv.hset(`user:${username}`, updatedUser);
 
     res.json({
       success: true,
       message: "Profil berhasil diperbarui.",
-      user: {
-        id: user.id,
-        username: user.username,
-        fullName: user.fullName,
-        email: user.email,
-        bio: user.bio,
-        avatar: user.avatar,
-        joinDate: user.joinDate,
-        theme: user.theme,
-        language: user.language,
-        focusTarget: user.focusTarget,
-      },
+      user: updatedUser,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: "Gagal memperbarui profil." });
@@ -224,9 +205,9 @@ app.put("/api/auth/profile", authMiddleware, async (req: any, res) => {
 
 // CRUD: Get Activities
 app.get("/api/activities", authMiddleware, async (req: any, res) => {
-  const userId = req.user.userId;
+  const { userId } = req.user;
   try {
-    const activities = await Activity.find({ userId }).sort({ createdAt: 1 });
+    let activities: any[] = (await kv.get(`activities:${userId}`)) || [];
     res.json({ success: true, data: activities });
   } catch (error) {
     res.status(500).json({ success: false, message: "Gagal mengambil aktivitas." });
@@ -235,7 +216,7 @@ app.get("/api/activities", authMiddleware, async (req: any, res) => {
 
 // CRUD: Create Activity
 app.post("/api/activities", authMiddleware, async (req: any, res) => {
-  const userId = req.user.userId;
+  const { userId } = req.user;
   const { title, description, category, priority, startTime, endTime } = req.body;
 
   if (!title || !category || !priority) {
@@ -243,7 +224,9 @@ app.post("/api/activities", authMiddleware, async (req: any, res) => {
   }
 
   try {
-    const newActivity = new Activity({
+    let activities: any[] = (await kv.get(`activities:${userId}`)) || [];
+    
+    const newActivity = {
       id: "act-" + Math.random().toString(36).substr(2, 9),
       userId,
       title,
@@ -254,9 +237,11 @@ app.post("/api/activities", authMiddleware, async (req: any, res) => {
       endTime: endTime || "",
       isCompleted: false,
       createdAt: new Date().toISOString(),
-    });
+    };
 
-    await newActivity.save();
+    activities.push(newActivity);
+    await kv.set(`activities:${userId}`, activities);
+
     res.status(201).json({ success: true, data: newActivity });
   } catch (error) {
     res.status(500).json({ success: false, message: "Gagal membuat aktivitas." });
@@ -265,17 +250,19 @@ app.post("/api/activities", authMiddleware, async (req: any, res) => {
 
 // CRUD: Update Activity
 app.put("/api/activities/:id", authMiddleware, async (req: any, res) => {
-  const userId = req.user.userId;
+  const { userId } = req.user;
   const activityId = req.params.id;
   const { title, description, category, priority, startTime, endTime, isCompleted } = req.body;
 
   try {
-    const activity = await Activity.findOne({ id: activityId, userId });
+    let activities: any[] = (await kv.get(`activities:${userId}`)) || [];
+    const index = activities.findIndex(a => a.id === activityId);
 
-    if (!activity) {
+    if (index === -1) {
       return res.status(404).json({ success: false, message: "Aktivitas tidak ditemukan." });
     }
 
+    const activity = activities[index];
     if (title !== undefined) activity.title = title;
     if (description !== undefined) activity.description = description;
     if (category !== undefined) activity.category = category;
@@ -284,7 +271,9 @@ app.put("/api/activities/:id", authMiddleware, async (req: any, res) => {
     if (endTime !== undefined) activity.endTime = endTime;
     if (isCompleted !== undefined) activity.isCompleted = isCompleted;
 
-    await activity.save();
+    activities[index] = activity;
+    await kv.set(`activities:${userId}`, activities);
+
     res.json({ success: true, data: activity });
   } catch (error) {
     res.status(500).json({ success: false, message: "Gagal memperbarui aktivitas." });
@@ -293,141 +282,90 @@ app.put("/api/activities/:id", authMiddleware, async (req: any, res) => {
 
 // CRUD: Delete Activity
 app.delete("/api/activities/:id", authMiddleware, async (req: any, res) => {
-  const userId = req.user.userId;
+  const { userId } = req.user;
   const activityId = req.params.id;
 
   try {
-    const result = await Activity.deleteOne({ id: activityId, userId });
+    let activities: any[] = (await kv.get(`activities:${userId}`)) || [];
+    const initialLen = activities.length;
+    activities = activities.filter(a => a.id !== activityId);
 
-    if (result.deletedCount === 0) {
+    if (activities.length === initialLen) {
       return res.status(404).json({ success: false, message: "Aktivitas tidak ditemukan." });
     }
 
+    await kv.set(`activities:${userId}`, activities);
     res.json({ success: true, message: "Aktivitas berhasil dihapus." });
   } catch (error) {
     res.status(500).json({ success: false, message: "Gagal menghapus aktivitas." });
   }
 });
 
-// AI Recommendation Engine using Gemini
+// AI Recommendation
 app.post("/api/ai/recommend", authMiddleware, async (req: any, res) => {
-  const userId = req.user.userId;
+  const { userId } = req.user;
   
   try {
-    const userActivities = await Activity.find({ userId });
+    let userActivities: any[] = (await kv.get(`activities:${userId}`)) || [];
     const client = getAIClient();
     if (!client) {
       return res.status(200).json({
         success: false,
-        message: "Gemini API belum dikonfigurasi. Silakan tambahkan GEMINI_API_KEY di pengaturan rahasia Anda.",
-        advice: "Saran Sederhana: Cobalah selesaikan aktivitas prioritas 'Tinggi' Anda terlebih dahulu di pagi hari ketika fokus Anda masih prima. Berikan jeda istirahat 5-10 menit di antara aktivitas menggunakan metode Pomodoro.",
+        message: "Gemini API belum dikonfigurasi.",
+        advice: "Saran: Selalu kerjakan prioritas Tinggi Anda lebih awal. Lakukan dengan fokus!",
       });
     }
 
     const activitiesContext = userActivities.map((act, index) => {
-      return `${index + 1}. [${act.category}] ${act.title} - Prioritas: ${act.priority}, Waktu: ${act.startTime || "Fleksibel"} - ${act.endTime || "Fleksibel"}, Status: ${act.isCompleted ? "Selesai" : "Belum Selesai"}. Deskripsi: ${act.description}`;
+      return `${index + 1}. [${act.category}] ${act.title} - Prioritas: ${act.priority}, Status: ${act.isCompleted ? "Selesai" : "Belum"}`;
     }).join("\n");
-
-    const prompt = `Anda adalah seorang asisten pengelola waktu dan produktivitas pribadi yang sangat ramah, santun, dan berpengalaman.
-Analisis daftar aktivitas pengguna berikut untuk hari ini:
-
-Daftar Aktivitas Pengguna:
-${activitiesContext || "(Tidak ada aktivitas terdaftar saat ini)"}
-
-Tugas Anda adalah:
-1. Berikan evaluasi singkat mengenai tingkat beban kerja pengguna hari ini (apakah realistis, terlalu padat, atau terlalu santai).
-2. Tuliskan 3 tips taktis atau saran manajemen waktu yang dipersonalisasi berdasarkan kategori dan prioritas aktivitas mereka.
-3. Rekomendasikan 1 aktivitas produktif atau kesehatan baru yang dapat meningkatkan rutinitas mereka saat ini.
-4. Jawab dalam format bahasa Indonesia yang memotivasi, ramah, profesional, dan menggunakan penulisan Markdown terstruktur yang rapi. Jangan terlalu panjang, berikan ringkasan yang nyaman dibaca sekilas.`;
 
     const response = await client.models.generateContent({
       model: "gemini-2.5-flash",
-      contents: prompt,
+      contents: `Berikan 1 paragraf saran untuk aktivitas ini:\n${activitiesContext}`,
     });
 
-    const adviceText = response.text || "Tidak dapat menghasilkan saran saat ini.";
-
-    res.json({
-      success: true,
-      advice: adviceText,
-    });
+    res.json({ success: true, advice: response.text || "Tidak ada saran." });
   } catch (error: any) {
-    console.error("Gemini AI API Error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan internal saat memanggil asisten AI.",
-      advice: "Saran Darurat: Tetap fokus pada tugas prioritas Tinggi Anda. Gunakan teknik time-boxing untuk membatasi durasi pengerjaan aktivitas agar tidak mengalami kelelahan.",
-    });
+    res.status(500).json({ success: false, message: "Error Gemini API." });
   }
 });
 
-// AI Chat Assistant
+// AI Chat
 app.post("/api/ai/chat", authMiddleware, async (req: any, res) => {
-  const userId = req.user.userId;
+  const { userId, username } = req.user;
   const { messages } = req.body;
   
-  if (!messages || !Array.isArray(messages)) {
-    return res.status(400).json({ success: false, message: "Pesan wajib berupa array." });
-  }
-
   try {
-    const userActivities = await Activity.find({ userId });
-    const user = await User.findOne({ id: userId });
-
+    let userActivities: any[] = (await kv.get(`activities:${userId}`)) || [];
+    const user = await kv.hgetall(`user:${username}`) as any;
+    
     const client = getAIClient();
     if (!client) {
-      return res.json({
-        success: true,
-        reply: "Halo! Saya adalah asisten AI pribadi Anda. Saat ini GEMINI_API_KEY belum dikonfigurasi, jadi saya berjalan dalam mode asisten offline lokal.\n\nSaran singkat untuk hari Anda:\n- Selesaikan tugas berkategori **Kesehatan** atau **Pekerjaan** prioritas Tinggi Anda terlebih dahulu di pagi hari!\n- Jangan lupa beristirahat sejenak di antara sela-sela aktivitas harian Anda.\n\nBagaimana saya bisa membantu Anda mengatur rencana aktivitas hari ini?",
-      });
+      return res.json({ success: true, reply: "AI Offline: Saya belum terhubung ke Gemini API." });
     }
-
-    const activitiesContext = userActivities.map((act, index) => {
-      return `${index + 1}. [${act.category}] ${act.title} - Prioritas: ${act.priority}, Waktu: ${act.startTime || "Fleksibel"} - ${act.endTime || "Fleksibel"}, Status: ${act.isCompleted ? "Selesai" : "Belum Selesai"}. Deskripsi: ${act.description}`;
-    }).join("\n");
-
-    const systemInstruction = `Anda adalah seorang asisten AI pribadi yang sangat ramah, santun, suportif, dan cerdas untuk Dayly - aplikasi manajemen waktu dan aktivitas produktif.
-Nama pengguna yang sedang Anda ajak bicara adalah: ${user?.fullName || user?.username || "Pengguna"}.
-Bio pengguna saat ini: ${user?.bio || "(Belum diisi)"}.
-
-Berikut adalah daftar aktivitas harian terkini pengguna di database:
-${activitiesContext || "(Tidak ada aktivitas terdaftar saat ini)"}
-
-Tugas Anda:
-1. Jawab pertanyaan pengguna mengenai cara mengelola aktivitas harian, tips kebugaran, cara memprioritaskan pekerjaan, atau cara menyelesaikan tugas mereka hari ini.
-2. Bantu pengguna merencanakan hari mereka secara terstruktur dan berikan motivasi positif.
-3. Jawab dalam format bahasa Indonesia yang memotivasi, hangat, ramah, dan profesional.
-4. Gunakan tulisan Markdown yang rapi (bold, bullet points) dan pastikan responnya ringkas serta mudah dibaca sekilas dalam panel widget chat yang relatif kecil.`;
-
-    const contents = messages.map((m: any) => {
-      return {
-        role: m.role === "assistant" ? "model" : "user",
-        parts: [{ text: m.text }],
-      };
-    });
 
     const response = await client.models.generateContent({
       model: "gemini-3.5-flash",
-      contents: contents,
-      config: {
-        systemInstruction: systemInstruction,
-      },
+      contents: messages.map((m: any) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.text }] })),
+      config: { systemInstruction: `Anda asisten untuk ${user?.fullName || username}.` },
     });
 
-    const replyText = response.text || "Maaf, asisten AI sedang beristirahat sejenak. Silakan kirim pesan kembali.";
-
-    res.json({
-      success: true,
-      reply: replyText,
-    });
+    res.json({ success: true, reply: response.text || "Pesan gagal diproses." });
   } catch (error: any) {
-    console.error("Gemini Chat API Error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan internal saat menghubungi asisten AI.",
-      reply: "Maaf, terjadi kendala teknis saat memproses pesan Anda. Silakan coba kembali sesaat lagi.",
-    });
+    res.status(500).json({ success: false, message: "Error Gemini AI Chat." });
   }
+});
+
+// Fallback for unhandled API routes
+app.use((req, res) => {
+  res.status(404).json({ success: false, message: `Route not found in Express: ${req.url}` });
+});
+
+// Error handler
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error(err.stack);
+  res.status(500).json({ success: false, message: `Express Error: ${err.message}` });
 });
 
 export default app;
