@@ -1,0 +1,8 @@
+{
+  "name": "Remix: DAYLY",
+  "description": "Aplikasi pengelolaan aktivitas harian dengan login sederhana, pelacakan aktivitas, statistik, dan sinkronisasi data.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

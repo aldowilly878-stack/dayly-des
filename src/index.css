@@ -1,0 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Tactile Stationery Shadows */
+.journal-card-shadow {
+  box-shadow: 4px 4px 0px 0px rgba(6, 78, 59, 0.12);
+}
+
+.dark .journal-card-shadow {
+  box-shadow: 4px 4px 0px 0px rgba(16, 185, 129, 0.08);
+}
+
+.journal-card-shadow-active {
+  box-shadow: 2px 2px 0px 0px rgba(6, 78, 59, 0.12);
+}
+
+/* Accessible focus ring style */
+input:focus, button:focus, [role="button"]:focus {
+  outline: 2px solid #00A86B !important;
+  outline-offset: 2px;
+}
+
+/* Custom soft animation classes matching the cute reference UI */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.96; transform: scale(1.015); }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Beautiful curved cloud shape like the reference image */
+.cloud-header {
+  position: relative;
+}
+
+.cloud-header::after {
+  content: "";
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background-image: radial-gradient(circle at 50% 100%, transparent 15px, #ffffff 16px);
+  background-size: 40px 40px;
+  background-repeat: repeat-x;
+}
+
+.dark .cloud-header::after {
+  background-image: radial-gradient(circle at 50% 100%, transparent 15px, #0b0f19 16px);
+}
+
+

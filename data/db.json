@@ -1,0 +1,72 @@
+{
+  "users": [
+    {
+      "id": "user-1",
+      "username": "satriopratama",
+      "passwordHash": "password123"
+    },
+    {
+      "id": "user-vq0nu44dm",
+      "username": "aldo",
+      "passwordHash": "aldo123",
+      "fullName": "",
+      "email": "",
+      "bio": "",
+      "avatar": "avatar-1",
+      "joinDate": "2026-07-07T06:06:58.428Z",
+      "theme": "dark",
+      "language": "id",
+      "focusTarget": 4
+    }
+  ],
+  "activities": [
+    {
+      "id": "act-1",
+      "userId": "user-1",
+      "title": "Olahraga Pagi (Jogging)",
+      "description": "Berlari santai di taman kompleks selama 30 menit untuk menjaga kebugaran fisik.",
+      "category": "Kesehatan",
+      "priority": "Tinggi",
+      "startTime": "06:00",
+      "endTime": "06:45",
+      "isCompleted": true,
+      "createdAt": "2026-07-07T02:58:46.592Z"
+    },
+    {
+      "id": "act-2",
+      "userId": "user-1",
+      "title": "Evaluasi Mingguan Tim Projek",
+      "description": "Melakukan sync mingguan via Zoom terkait progres pengembangan fitur aplikasi baru.",
+      "category": "Pekerjaan",
+      "priority": "Tinggi",
+      "startTime": "09:00",
+      "endTime": "10:30",
+      "isCompleted": false,
+      "createdAt": "2026-07-07T03:58:46.592Z"
+    },
+    {
+      "id": "act-3",
+      "userId": "user-1",
+      "title": "Membaca Dokumentasi TypeScript & Tailwind CSS",
+      "description": "Mempelajari integrasi terbaru, utility types, dan kustomisasi konfigurasi @import.",
+      "category": "Belajar",
+      "priority": "Sedang",
+      "startTime": "13:30",
+      "endTime": "15:00",
+      "isCompleted": false,
+      "createdAt": "2026-07-07T04:58:46.592Z"
+    },
+    {
+      "id": "act-4",
+      "userId": "user-1",
+      "title": "Membersihkan Meja Kerja & Kamar",
+      "description": "Merapikan kabel, menyapu lantai, dan membuang sampah sisa pekerjaan.",
+      "category": "Rumah",
+      "priority": "Rendah",
+      "startTime": "17:00",
+      "endTime": "17:30",
+      "isCompleted": false,
+      "createdAt": "2026-07-07T05:58:46.592Z"
+    }
+  ]
+}
