@@ -75,81 +75,85 @@ export default function ActivityFormModal({ activity, onClose, onSubmit, languag
   return (
     <div
       id="activity-modal-overlay"
-      className="fixed inset-0 bg-slate-900/50 dark:bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
+      className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
       onClick={onClose}
     >
       <div
         id="activity-modal-content"
-        className="bg-white dark:bg-slate-900 rounded-3xl elevation-4 w-full max-w-lg overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh] animate-scale-in"
+        className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl w-full max-w-lg overflow-hidden border border-emerald-100/40 dark:border-slate-800/80 flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800">
-          <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg font-display tracking-tight">
+        <div className="flex items-center justify-between p-5 border-b border-emerald-100/30 dark:border-slate-800/60 bg-[#F4FAF7]/50 dark:bg-slate-950/20">
+          <h3 className="font-extrabold text-slate-800 dark:text-slate-100 text-base font-sans">
             {activity ? t.modalTitleEdit : t.modalTitleAdd}
           </h3>
           <button
             id="close-modal-btn"
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-850 transition-all cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-5">
+        <form onSubmit={handleSubmit} className="p-5 overflow-y-auto space-y-4">
           {error && (
-            <div id="form-error-banner" className="p-3.5 bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 text-sm rounded-xl border-l-4 border-red-500 flex items-center gap-2.5">
+            <div id="form-error-banner" className="p-3 bg-rose-50 dark:bg-rose-950/20 text-rose-700 dark:text-rose-400 text-xs rounded-xl border border-rose-100 dark:border-rose-900/40 flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 shrink-0" />
-              <span className="font-medium">{error}</span>
+              <span>{error}</span>
             </div>
           )}
 
           {/* Title */}
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">
-              {t.formTitleLabel} <span className="text-red-500">*</span>
+            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+              {t.formTitleLabel} <span className="text-rose-500 font-bold">*</span>
             </label>
-            <input
-              id="form-input-title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder={t.formTitlePlaceholder}
-              className="w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium placeholder:text-slate-400"
-              maxLength={80}
-              required
-            />
+            <div className="relative">
+              <input
+                id="form-input-title"
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder={t.formTitlePlaceholder}
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
+                maxLength={80}
+                required
+              />
+            </div>
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">
+            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
               {t.formDescLabel}
             </label>
-            <textarea
-              id="form-input-description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder={t.formDescPlaceholder}
-              className="w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all min-h-[90px] max-h-[160px] font-medium placeholder:text-slate-400 resize-none"
-              maxLength={400}
-            />
+            <div className="relative">
+              <textarea
+                id="form-input-description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder={t.formDescPlaceholder}
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all min-h-[80px] max-h-[160px] font-medium"
+                maxLength={400}
+              />
+            </div>
           </div>
 
           {/* Category & Priority Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Category */}
             <div>
-              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                 {t.categoryLabel}
               </label>
               <select
                 id="form-select-category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value as ActivityCategory)}
-                className="w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer font-medium"
+                className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer font-semibold"
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
@@ -165,16 +169,16 @@ export default function ActivityFormModal({ activity, onClose, onSubmit, languag
 
             {/* Priority */}
             <div>
-              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                 {t.priorityLabel}
               </label>
-              <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-2xl w-full border border-slate-200 dark:border-slate-700">
+              <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl w-full border border-transparent dark:border-slate-850">
                 {PRIORITIES.map((prio) => {
                   const isActive = priority === prio;
                   const colorMap = {
-                    Tinggi: isActive ? "bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-sm" : "text-slate-600 dark:text-slate-400 hover:text-red-600",
-                    Sedang: isActive ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm" : "text-slate-600 dark:text-slate-400 hover:text-amber-600",
-                    Rendah: isActive ? "bg-gradient-to-r from-sky-500 to-blue-500 text-white shadow-sm" : "text-slate-600 dark:text-slate-400 hover:text-sky-600",
+                    Tinggi: isActive ? "bg-rose-500 text-white shadow-sm" : "text-slate-600 dark:text-slate-400 hover:text-rose-600",
+                    Sedang: isActive ? "bg-orange-500 text-white shadow-sm" : "text-slate-600 dark:text-slate-400 hover:text-orange-600",
+                    Rendah: isActive ? "bg-sky-500 text-white shadow-sm" : "text-slate-600 dark:text-slate-400 hover:text-sky-600",
                   };
                   return (
                     <button
@@ -182,7 +186,7 @@ export default function ActivityFormModal({ activity, onClose, onSubmit, languag
                       id={`prio-btn-${prio}`}
                       type="button"
                       onClick={() => setPriority(prio)}
-                      className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${colorMap[prio]}`}
+                      className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${colorMap[prio]}`}
                     >
                       {getPriorityLabel(prio)}
                     </button>
@@ -195,46 +199,50 @@ export default function ActivityFormModal({ activity, onClose, onSubmit, languag
           {/* Start and End Times */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                 {t.formStartTimeLabel}
               </label>
-              <input
-                id="form-input-starttime"
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                className="w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer font-medium"
-              />
+              <div className="relative">
+                <input
+                  id="form-input-starttime"
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer font-medium"
+                />
+              </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                 {t.formEndTimeLabel}
               </label>
-              <input
-                id="form-input-endtime"
-                type="time"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                className="w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer font-medium"
-              />
+              <div className="relative">
+                <input
+                  id="form-input-endtime"
+                  type="time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer font-medium"
+                />
+              </div>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-5 border-t border-slate-100 dark:border-slate-800 mt-2">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/60 mt-5">
             <button
               id="cancel-modal-btn"
               type="button"
               onClick={onClose}
-              className="px-5 py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all cursor-pointer"
+              className="px-4 py-2.5 text-xs font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/40 rounded-xl transition-all cursor-pointer"
             >
               {t.formCancelBtn}
             </button>
             <button
               id="submit-modal-btn"
               type="submit"
-              className="px-6 py-3 text-sm font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-indigo-500/20 cursor-pointer active-press"
+              className="px-5 py-2.5 text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-750 rounded-xl transition-all flex items-center gap-1.5 shadow-md shadow-emerald-500/10 cursor-pointer"
             >
               <Check className="w-4 h-4 stroke-[3]" />
               <span>{activity ? t.formSubmitEdit : t.formSubmitAdd}</span>

@@ -75,32 +75,20 @@ export default function App() {
 
   if (loadingSession) {
     return (
-      <div id="session-loader" className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] flex flex-col items-center justify-center transition-colors duration-300">
-        {/* Decorative gradient blobs */}
-        <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-1/3 right-1/4 w-72 h-72 bg-sky-400/10 rounded-full blur-3xl pointer-events-none" />
-        
-        <div className="relative flex items-center justify-center animate-scale-in">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
-            <Sparkles className="w-6 h-6 text-white animate-pulse" />
-          </div>
+      <div id="session-loader" className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center transition-colors duration-300">
+        <div className="relative flex items-center justify-center">
+          <div className="w-12 h-12 border-4 border-indigo-200 dark:border-indigo-900 border-t-indigo-600 rounded-full animate-spin" />
+          <Sparkles className="absolute w-5 h-5 text-indigo-500 animate-pulse" />
         </div>
-        <div className="mt-5 space-y-2 text-center animate-fade-in">
-          <p className="text-sm font-bold text-slate-700 dark:text-slate-300 tracking-tight">
-            DAYLY
-          </p>
-          <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-bounce" style={{ animationDelay: '0ms' }} />
-            <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-            <div className="w-1.5 h-1.5 rounded-full bg-indigo-300 animate-bounce" style={{ animationDelay: '300ms' }} />
-          </div>
-        </div>
+        <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-4 animate-pulse">
+          Menghubungkan Sesi...
+        </p>
       </div>
     );
   }
 
   return (
-    <div id="app-root" className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] text-slate-800 dark:text-slate-100 transition-colors duration-300">
+    <div id="app-root" className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-300">
       {token && user ? (
         <Dashboard token={token} user={user} onLogout={handleLogout} onUserUpdate={handleUserUpdate} />
       ) : (

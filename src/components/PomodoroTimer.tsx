@@ -228,31 +228,31 @@ export default function PomodoroTimer({ language }: PomodoroTimerProps) {
   const progressPercentage = (timeLeft / modeSettings[mode].duration) * 100;
 
   return (
-    <div id="pomodoro-timer-card" className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 elevation-2 transition-all duration-300">
+    <div id="pomodoro-timer-card" className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-[#064E3B]/10 dark:border-emerald-500/20 p-6 journal-card-shadow transition-all duration-300">
       
       {/* Header Row */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Brain className="w-5 h-5 text-indigo-500" />
-          <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm font-display tracking-tight">{t.pomodoroTitle}</h3>
+          <Brain className="w-5 h-5 text-emerald-500 animate-pulse" />
+          <h3 className="font-black text-slate-800 dark:text-slate-100 text-sm font-display tracking-tight">{t.pomodoroTitle}</h3>
         </div>
         <div className="flex items-center gap-2">
           {/* Settings toggle button */}
           <button
             id="toggle-pomodoro-settings"
             onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-            className={`p-2 rounded-xl border transition-all cursor-pointer ${
+            className={`p-2 rounded-xl border-2 transition-all cursor-pointer ${
               isSettingsOpen 
-                ? "bg-indigo-50 dark:bg-indigo-950/40 border-indigo-500 text-indigo-600 dark:text-indigo-400" 
-                : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-600 dark:text-emerald-400" 
+                : "bg-slate-50 dark:bg-slate-950 border-[#064E3B]/10 dark:border-slate-800/60 text-slate-500 hover:text-slate-850 dark:hover:text-slate-200"
             }`}
             title={language === "id" ? "Sesuaikan Alarm & Waktu" : "Customize Alarm & Durations"}
           >
             <Sliders className="w-3.5 h-3.5" />
           </button>
           
-          <div className="flex items-center gap-1.5 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30 px-3 py-1.5 rounded-full border border-indigo-100 dark:border-indigo-900/50">
-            <Flame className="w-3.5 h-3.5 fill-indigo-500 text-indigo-500 dark:text-indigo-400" />
+          <div className="flex items-center gap-1.5 text-[10px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-3 py-1.5 rounded-full border-2 border-[#064E3B]/10">
+            <Flame className="w-3.5 h-3.5 fill-emerald-500 text-emerald-500 dark:text-emerald-400 animate-bounce" />
             <span className="font-mono">
               {language === "id" ? "Sesi" : "Session"}: {sessionsCompleted}
               {targetIntervals > 0 && `/${targetIntervals}`}
@@ -264,9 +264,9 @@ export default function PomodoroTimer({ language }: PomodoroTimerProps) {
       <div className="flex flex-col items-center">
         {/* Helper info banner for Smart Interval Calculation */}
         {isSmartMode && (
-          <div className="mb-4 w-full bg-indigo-50/60 dark:bg-indigo-950/15 border border-indigo-100 dark:border-indigo-900/40 rounded-2xl p-3 text-center flex items-center justify-center gap-2">
-            <Sparkles className="w-4 h-4 text-indigo-500" />
-            <p className="text-[11px] text-indigo-800 dark:text-indigo-300 font-semibold leading-relaxed">
+          <div className="mb-4 w-full bg-emerald-50/60 dark:bg-emerald-950/15 border-2 border-[#064E3B]/10 rounded-2xl p-3 text-center flex items-center justify-center gap-2 shadow-sm/5">
+            <Sparkles className="w-4 h-4 text-emerald-500" />
+            <p className="text-[11px] text-emerald-800 dark:text-emerald-300 font-extrabold leading-relaxed font-sans">
               {language === "id" 
                 ? `Mode Pintar: Belajar ${totalTargetStudyMin} m dibagi ${targetIntervals} sesi = @${calculatedWorkMin} m / sesi.` 
                 : `Smart Mode: Study ${totalTargetStudyMin} mins split into ${targetIntervals} sessions = @${calculatedWorkMin} mins / session.`
@@ -276,12 +276,12 @@ export default function PomodoroTimer({ language }: PomodoroTimerProps) {
         )}
 
         {/* Toggle Modes tabs */}
-        <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-2xl w-full mb-6 border border-slate-200 dark:border-slate-700">
+        <div className="flex bg-slate-100 dark:bg-slate-950 p-1.5 rounded-2xl w-full mb-6 border-2 border-[#064E3B]/10">
           <button
             id="mode-btn-work"
             onClick={() => switchMode("work")}
-            className={`flex-1 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
-              mode === "work" ? "bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200/40" : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+            className={`flex-1 py-1.5 text-[11px] font-black rounded-xl transition-all cursor-pointer ${
+              mode === "work" ? "bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-sm font-black border border-slate-200/20" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
             }`}
           >
             {t.pomodoroFocusBtn} ({calculatedWorkMin}m)
@@ -289,8 +289,8 @@ export default function PomodoroTimer({ language }: PomodoroTimerProps) {
           <button
             id="mode-btn-short"
             onClick={() => switchMode("shortBreak")}
-            className={`flex-1 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
-              mode === "shortBreak" ? "bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-sm border border-slate-200/40" : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+            className={`flex-1 py-1.5 text-[11px] font-black rounded-xl transition-all cursor-pointer ${
+              mode === "shortBreak" ? "bg-white dark:bg-slate-900 text-teal-600 dark:text-teal-400 shadow-sm font-black border border-slate-200/20" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
             }`}
           >
             {t.pomodoroShortBreakBtn} ({shortMin}m)
@@ -298,8 +298,8 @@ export default function PomodoroTimer({ language }: PomodoroTimerProps) {
           <button
             id="mode-btn-long"
             onClick={() => switchMode("longBreak")}
-            className={`flex-1 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
-              mode === "longBreak" ? "bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200/40" : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+            className={`flex-1 py-1.5 text-[11px] font-black rounded-xl transition-all cursor-pointer ${
+              mode === "longBreak" ? "bg-white dark:bg-slate-900 text-cyan-600 dark:text-cyan-400 shadow-sm font-black border border-slate-200/20" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
             }`}
           >
             {t.pomodoroLongBreakBtn} ({longMin}m)
@@ -323,10 +323,10 @@ export default function PomodoroTimer({ language }: PomodoroTimerProps) {
               r="44"
               className={
                 mode === "work"
-                  ? "stroke-indigo-500"
+                  ? "stroke-emerald-500"
                   : mode === "shortBreak"
-                  ? "stroke-sky-500"
-                  : "stroke-emerald-500"
+                  ? "stroke-teal-500"
+                  : "stroke-cyan-500"
               }
               strokeWidth="6"
               fill="transparent"
@@ -359,14 +359,14 @@ export default function PomodoroTimer({ language }: PomodoroTimerProps) {
           <button
             id="timer-toggle-btn"
             onClick={toggleTimer}
-            className={`flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-sm transition-all cursor-pointer active-press ${
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-sm transition-all shadow-sm cursor-pointer ${
               isRunning
-                ? "bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-900 dark:hover:bg-slate-200"
+                ? "bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-900 dark:hover:bg-slate-200 animate-pulse"
                 : mode === "work"
-                ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-500/25"
+                ? "bg-emerald-500 text-white hover:bg-emerald-600 shadow-emerald-500/10"
                 : mode === "shortBreak"
-                ? "bg-gradient-to-r from-sky-500 to-blue-500 text-white hover:from-sky-400 hover:to-blue-400 shadow-lg shadow-sky-500/25"
-                : "bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-400 hover:to-teal-400 shadow-lg shadow-emerald-500/25"
+                ? "bg-teal-500 text-white hover:bg-teal-600 shadow-teal-500/10"
+                : "bg-cyan-500 text-white hover:bg-cyan-600 shadow-cyan-500/10"
             }`}
           >
             {isRunning ? (
@@ -392,10 +392,10 @@ export default function PomodoroTimer({ language }: PomodoroTimerProps) {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="overflow-hidden border-t border-slate-100 dark:border-slate-800 mt-6 pt-4 w-full space-y-4"
+              className="overflow-hidden border-t border-slate-100 dark:border-slate-800/80 mt-6 pt-4 w-full space-y-4"
             >
               {/* Toggle Mode: Classic vs Smart Calculated Intervals */}
-              <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-200 dark:border-slate-700">
+              <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-950 p-2.5 rounded-2xl border border-slate-200/40 dark:border-slate-800/40">
                 <div>
                   <h4 className="text-[11px] font-bold text-slate-800 dark:text-slate-200">
                     {language === "id" ? "Kalkulasi Interval Sesi Otomatis" : "Auto Session Calculation"}
@@ -412,7 +412,7 @@ export default function PomodoroTimer({ language }: PomodoroTimerProps) {
                     setIsSmartMode(!isSmartMode);
                     resetTimer();
                   }}
-                  className="text-indigo-500 hover:opacity-80 transition-all cursor-pointer"
+                  className="text-emerald-500 hover:opacity-80 transition-all cursor-pointer"
                 >
                   {isSmartMode ? (
                     <ToggleRight className="w-9 h-9" />
@@ -424,7 +424,7 @@ export default function PomodoroTimer({ language }: PomodoroTimerProps) {
 
               {isSmartMode ? (
                 /* SMART INTERVAL CALCULATED MODE CONTROLS */
-                <div className="grid grid-cols-2 gap-3.5 bg-indigo-50/30 dark:bg-indigo-950/10 p-3 rounded-2xl border border-dashed border-indigo-200 dark:border-indigo-800">
+                <div className="grid grid-cols-2 gap-3.5 bg-emerald-50/30 dark:bg-emerald-950/10 p-3 rounded-2xl border border-dashed border-emerald-200 dark:border-emerald-800">
                   {/* Total Target Study Time (e.g. 60 mins / 1 hour) */}
                   <div className="space-y-1">
                     <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
@@ -649,9 +649,9 @@ export default function PomodoroTimer({ language }: PomodoroTimerProps) {
                     id="test-selected-alarm"
                     type="button"
                     onClick={() => playAlarmSound(selectedAlarm)}
-                    className="flex items-center gap-1 text-[11px] font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 px-2.5 py-1 rounded-lg transition-all cursor-pointer"
+                    className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/60 px-2.5 py-0.5 rounded-lg transition-all cursor-pointer shadow-sm"
                   >
-                    <Volume2 className="w-3 h-3 text-indigo-500" />
+                    <Volume2 className="w-3 h-3 text-emerald-500" />
                     <span>{language === "id" ? "Uji Coba" : "Preview"}</span>
                   </button>
                 </div>
@@ -672,9 +672,9 @@ export default function PomodoroTimer({ language }: PomodoroTimerProps) {
                         setSelectedAlarm(item.id);
                         playAlarmSound(item.id);
                       }}
-                      className={`py-1.5 text-center text-[10px] font-semibold rounded-lg border transition-all cursor-pointer ${
+                      className={`py-1.5 text-center text-[10px] font-bold rounded-lg border transition-all cursor-pointer ${
                         selectedAlarm === item.id
-                          ? "bg-indigo-500 border-indigo-500 text-white shadow-sm"
+                          ? "bg-emerald-500 border-emerald-500 text-white shadow-sm font-bold"
                           : "bg-slate-50 dark:bg-slate-950 border-slate-200/40 dark:border-slate-800/60 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900"
                       }`}
                     >

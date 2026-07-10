@@ -142,7 +142,7 @@ export default function ProfileSection({ token, user, activities, onUserUpdate, 
       <div className="flex flex-col md:flex-row gap-6">
         
         {/* LEFT CARD: AVATAR & BASIC DETAILS */}
-        <div id="profile-info-card" className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 elevation-2 transition-all duration-300">
+        <div id="profile-info-card" className="flex-1 bg-white dark:bg-slate-900 border border-emerald-100/40 dark:border-slate-800/80 rounded-3xl p-6 shadow-sm transition-all duration-300">
           <div className="flex justify-between items-start mb-6">
             <div>
               <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg tracking-tight font-sans">
@@ -157,7 +157,7 @@ export default function ProfileSection({ token, user, activities, onUserUpdate, 
               <button
                 id="edit-profile-toggle-btn"
                 onClick={() => setIsEditing(true)}
-                className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-900 px-3.5 py-1.5 rounded-xl transition-all cursor-pointer elevation-1"
+                className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 px-3.5 py-1.5 rounded-xl transition-all cursor-pointer shadow-sm"
               >
                 <Edit3 className="w-3.5 h-3.5" />
                 <span>{t.profileEditBtn}</span>
@@ -172,8 +172,8 @@ export default function ProfileSection({ token, user, activities, onUserUpdate, 
             </div>
           )}
           {success && (
-            <div className="mb-4 p-3 bg-indigo-50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-400 text-xs rounded-xl border border-indigo-100 dark:border-indigo-900/40 flex items-center gap-1.5">
-              <Check className="w-4 h-4 text-indigo-500 stroke-[3]" />
+            <div className="mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 text-xs rounded-xl border border-emerald-100 dark:border-emerald-900/40 flex items-center gap-1.5">
+              <Check className="w-4 h-4 text-emerald-500 stroke-[3]" />
               <span>{success}</span>
             </div>
           )}
@@ -183,13 +183,13 @@ export default function ProfileSection({ token, user, activities, onUserUpdate, 
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4.5 pb-6 border-b border-slate-100 dark:border-slate-800/60">
                 {/* Big Avatar Ring */}
-                <div className="w-24 h-24 bg-white dark:bg-slate-950 rounded-[1.8rem] flex items-center justify-center border border-indigo-100 dark:border-indigo-900/50 shadow-inner shrink-0 relative overflow-hidden p-1">
+                <div className="w-24 h-24 bg-white dark:bg-slate-950 rounded-[1.8rem] flex items-center justify-center border border-emerald-100/60 dark:border-emerald-900/50 shadow-inner shrink-0 relative overflow-hidden p-1">
                   {currentAvatarObj.image ? (
                     <img src={currentAvatarObj.image} alt="Avatar" className="w-full h-full rounded-2xl object-cover" referrerPolicy="no-referrer" />
                   ) : (
                     <span className="text-4xl animate-pulse-slow">{currentAvatarObj.emoji}</span>
                   )}
-                  <div className="absolute -bottom-1 -right-1 bg-indigo-500 text-white p-1.5 rounded-full shadow-sm z-10">
+                  <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1.5 rounded-full shadow-sm z-10">
                     <Trophy className="w-3.5 h-3.5" />
                   </div>
                 </div>
@@ -222,7 +222,7 @@ export default function ProfileSection({ token, user, activities, onUserUpdate, 
               <div className="space-y-4">
                 <div>
                   <h5 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5 mb-2">
-                    <FileText className="w-3.5 h-3.5 text-indigo-500" />
+                    <FileText className="w-3.5 h-3.5 text-emerald-500" />
                     <span>{t.profileBio}</span>
                   </h5>
                   <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed italic bg-slate-50 dark:bg-slate-900/60 p-4 border border-slate-100 dark:border-slate-800/60 rounded-2xl font-medium">
@@ -231,8 +231,8 @@ export default function ProfileSection({ token, user, activities, onUserUpdate, 
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 pt-2">
-                  <div className="bg-indigo-50/40 dark:bg-indigo-950/20 border border-indigo-100/50 dark:border-indigo-800/40 p-4.5 rounded-2xl flex items-center gap-3">
-                    <div className="p-2 bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 rounded-xl shrink-0">
+                  <div className="bg-emerald-50/20 dark:bg-emerald-950/20 border border-emerald-100/30 dark:border-emerald-800/40 p-4.5 rounded-2xl flex items-center gap-3">
+                    <div className="p-2 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-500 rounded-xl shrink-0">
                       <Clock className="w-4 h-4" />
                     </div>
                     <div>
@@ -245,8 +245,8 @@ export default function ProfileSection({ token, user, activities, onUserUpdate, 
                     </div>
                   </div>
 
-                  <div className="bg-purple-50/40 dark:bg-purple-950/20 border border-purple-100/50 dark:border-purple-800/40 p-4.5 rounded-2xl flex items-center gap-3">
-                    <div className="p-2 bg-purple-100 dark:bg-purple-950/60 text-purple-600 rounded-xl shrink-0">
+                  <div className="bg-teal-50/20 dark:bg-teal-950/20 border border-teal-100/30 dark:border-teal-800/40 p-4.5 rounded-2xl flex items-center gap-3">
+                    <div className="p-2 bg-teal-50 dark:bg-teal-950/40 text-teal-500 rounded-xl shrink-0">
                       <Flame className="w-4 h-4" />
                     </div>
                     <div>
@@ -279,7 +279,7 @@ export default function ProfileSection({ token, user, activities, onUserUpdate, 
                         onClick={() => setSelectedAvatar(av.id)}
                         className={`flex flex-col items-center justify-center py-2 rounded-xl border transition-all cursor-pointer ${
                           isSelected
-                            ? "bg-white dark:bg-slate-900 border-indigo-500 text-indigo-600 shadow-md transform scale-105 font-bold"
+                            ? "bg-white dark:bg-slate-900 border-emerald-500 text-emerald-600 shadow-md transform scale-105 font-bold"
                             : "border-transparent bg-transparent hover:bg-white/40 dark:hover:bg-slate-900/40 text-slate-500"
                         }`}
                       >
@@ -307,7 +307,7 @@ export default function ProfileSection({ token, user, activities, onUserUpdate, 
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder={t.profilePlaceholderFullName}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-400"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-400"
                   maxLength={50}
                 />
               </div>
@@ -322,7 +322,7 @@ export default function ProfileSection({ token, user, activities, onUserUpdate, 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={t.profilePlaceholderEmail}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-400"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-400"
                   maxLength={100}
                 />
               </div>
@@ -339,9 +339,9 @@ export default function ProfileSection({ token, user, activities, onUserUpdate, 
                     max="12"
                     value={focusTarget}
                     onChange={(e) => setFocusTarget(Number(e.target.value))}
-                    className="flex-1 accent-indigo-600 h-2 bg-slate-100 rounded-lg cursor-pointer"
+                    className="flex-1 accent-emerald-600 h-2 bg-slate-100 rounded-lg cursor-pointer"
                   />
-                  <span className="w-12 text-center bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-100/40 font-bold text-xs py-1 px-2.5 rounded-xl">
+                  <span className="w-12 text-center bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-100/40 font-bold text-xs py-1 px-2.5 rounded-xl">
                     {focusTarget}h
                   </span>
                 </div>
@@ -356,7 +356,7 @@ export default function ProfileSection({ token, user, activities, onUserUpdate, 
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   placeholder={t.profilePlaceholderBio}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all min-h-[80px] max-h-[140px] placeholder:text-slate-400"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all min-h-[80px] max-h-[140px] placeholder:text-slate-400"
                   maxLength={300}
                 />
               </div>
@@ -373,7 +373,7 @@ export default function ProfileSection({ token, user, activities, onUserUpdate, 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-5 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 rounded-xl shadow-lg shadow-indigo-500/25 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active-press"
+                  className="px-5 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 rounded-xl shadow-sm transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
                   {loading ? (
                     <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -390,10 +390,10 @@ export default function ProfileSection({ token, user, activities, onUserUpdate, 
         </div>
 
         {/* RIGHT CARD: STATS & ACHIEVEMENTS */}
-        <div id="profile-stats-card" className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 elevation-2 flex flex-col justify-between transition-all duration-300">
+        <div id="profile-stats-card" className="flex-1 bg-white dark:bg-slate-900 border border-emerald-100/40 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm flex flex-col justify-between transition-all duration-300">
           <div>
             <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base mb-4 tracking-tight flex items-center gap-1.5">
-              <Award className="w-5 h-5 text-indigo-500" />
+              <Award className="w-5 h-5 text-emerald-500" />
               <span>{t.profileTitleStats}</span>
             </h3>
 
@@ -402,11 +402,11 @@ export default function ProfileSection({ token, user, activities, onUserUpdate, 
               <div>
                 <div className="flex items-center justify-between text-xs mb-1.5 font-medium">
                   <span className="text-slate-500 dark:text-slate-400 font-semibold">{t.statProgress}</span>
-                  <span className="text-indigo-600 dark:text-indigo-400 font-bold">{completionRate}%</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">{completionRate}%</span>
                 </div>
                 <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
                   <div
-                    className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-all duration-500"
+                    className="bg-emerald-500 dark:bg-emerald-400 h-full rounded-full transition-all duration-500"
                     style={{ width: `${completionRate}%` }}
                   />
                 </div>
@@ -415,12 +415,12 @@ export default function ProfileSection({ token, user, activities, onUserUpdate, 
               {/* Achievements grid */}
               <div className="grid grid-cols-2 gap-3 pt-2">
                 <div className="bg-slate-50 dark:bg-slate-950 border border-slate-100/60 dark:border-slate-800/40 p-4 rounded-xl text-center space-y-1">
-                  <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400">{completedActivities}</div>
+                  <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{completedActivities}</div>
                   <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t.profileStatCompleted}</div>
                 </div>
 
                 <div className="bg-slate-50 dark:bg-slate-950 border border-slate-100/60 dark:border-slate-800/40 p-4 rounded-xl text-center space-y-1">
-                  <div className="text-sm font-black text-purple-600 dark:text-purple-400 truncate">{topCategory}</div>
+                  <div className="text-sm font-black text-teal-600 dark:text-teal-400 truncate">{topCategory}</div>
                   <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">{t.profileStatCategories}</div>
                 </div>
               </div>
@@ -434,22 +434,22 @@ export default function ProfileSection({ token, user, activities, onUserUpdate, 
             </h4>
             
             <div className="space-y-2">
-              <div className="flex items-center gap-3 p-2 bg-indigo-50/60 dark:bg-indigo-950/20 rounded-xl border border-indigo-100 dark:border-indigo-900/40">
+              <div className="flex items-center gap-3 p-2 bg-emerald-50/60 dark:bg-emerald-950/10 rounded-xl border border-emerald-100/40 dark:border-emerald-900/20">
                 <span className="text-lg shrink-0">🚀</span>
                 <div className="min-w-0">
                   <p className="text-xs font-bold text-slate-700 dark:text-slate-200">First Steps</p>
                   <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate">Selesaikan aktivitas pertamamu di DAYLY</p>
                 </div>
-                {completedActivities >= 1 && <span className="ml-auto text-indigo-500 font-semibold text-xs shrink-0">✅</span>}
+                {completedActivities >= 1 && <span className="ml-auto text-emerald-500 font-semibold text-xs shrink-0">✅</span>}
               </div>
 
-              <div className="flex items-center gap-3 p-2 bg-purple-50/60 dark:bg-purple-950/20 rounded-xl border border-purple-100 dark:border-purple-900/40">
+              <div className="flex items-center gap-3 p-2 bg-teal-50/60 dark:bg-teal-950/10 rounded-xl border border-teal-100/40 dark:border-teal-900/20">
                 <span className="text-lg shrink-0">🏆</span>
                 <div className="min-w-0">
                   <p className="text-xs font-bold text-slate-700 dark:text-slate-200">Consistency Master</p>
                   <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate">Selesaikan 5 aktivitas</p>
                 </div>
-                {completedActivities >= 5 && <span className="ml-auto text-indigo-500 font-semibold text-xs shrink-0">✅</span>}
+                {completedActivities >= 5 && <span className="ml-auto text-emerald-500 font-semibold text-xs shrink-0">✅</span>}
               </div>
 
               <div className="flex items-center gap-3 p-2 bg-rose-50/60 dark:bg-rose-950/10 rounded-xl border border-rose-100/40 dark:border-rose-900/20">
@@ -458,7 +458,7 @@ export default function ProfileSection({ token, user, activities, onUserUpdate, 
                   <p className="text-xs font-bold text-slate-700 dark:text-slate-200">Productivity Ninja</p>
                   <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate">Rasio penyelesaian di atas 80%</p>
                 </div>
-                {completionRate >= 80 && completedActivities >= 3 && <span className="ml-auto text-indigo-500 font-semibold text-xs shrink-0">✅</span>}
+                {completionRate >= 80 && completedActivities >= 3 && <span className="ml-auto text-emerald-500 font-semibold text-xs shrink-0">✅</span>}
               </div>
             </div>
           </div>

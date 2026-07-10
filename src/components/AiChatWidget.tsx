@@ -166,7 +166,7 @@ export default function AiChatWidget({ token, language }: AiChatWidgetProps) {
     return parts.map((part, i) => {
       if (i % 2 === 1) {
         return (
-          <strong key={i} className="font-extrabold text-indigo-600 dark:text-indigo-400">
+          <strong key={i} className="font-extrabold text-emerald-600 dark:text-emerald-400">
             {part}
           </strong>
         );
@@ -219,10 +219,10 @@ export default function AiChatWidget({ token, language }: AiChatWidgetProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 350 }}
-            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl elevation-4 w-[90vw] sm:w-[380px] h-[500px] flex flex-col overflow-hidden mb-4 transition-colors"
+            className="bg-white dark:bg-slate-900 border border-emerald-100/40 dark:border-slate-800/80 rounded-3xl shadow-2xl w-[90vw] sm:w-[380px] h-[500px] flex flex-col overflow-hidden mb-4 transition-colors"
           >
             {/* Window Header */}
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-950 dark:to-purple-950 px-4 py-3 flex items-center justify-between text-white shadow-md">
+            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-950 dark:to-teal-950 px-4 py-3 flex items-center justify-between text-white shadow-md">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 bg-white border border-white/20 rounded-xl overflow-hidden shadow-inner flex items-center justify-center shrink-0">
                   <img src={mascotImg} alt="Mascot" className="w-full h-full object-cover animate-pulse-slow" referrerPolicy="no-referrer" />
@@ -230,8 +230,8 @@ export default function AiChatWidget({ token, language }: AiChatWidgetProps) {
                 <div>
                   <h3 className="text-xs sm:text-sm font-black tracking-wide font-display">Sahabat Dayly</h3>
                   <div className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 bg-purple-300 rounded-full animate-ping" />
-                    <span className="text-[9px] text-indigo-100 font-bold uppercase tracking-widest leading-none">
+                    <span className="w-1.5 h-1.5 bg-emerald-300 rounded-full animate-ping" />
+                    <span className="text-[9px] text-emerald-100 font-bold uppercase tracking-widest leading-none">
                       {language === "id" ? "Siap Menemani" : "Active Now"}
                     </span>
                   </div>
@@ -268,8 +268,8 @@ export default function AiChatWidget({ token, language }: AiChatWidgetProps) {
                   <div
                     className={`max-w-[85%] rounded-2xl px-4 py-2.5 shadow-sm border ${
                       m.role === "user"
-                        ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-tr-none"
-                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-tl-none"
+                        ? "bg-emerald-600 border-emerald-600 text-white rounded-tr-none"
+                        : "bg-white dark:bg-slate-900 border-slate-200/40 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-tl-none"
                     }`}
                   >
                     {m.role === "user" ? (
@@ -281,7 +281,7 @@ export default function AiChatWidget({ token, language }: AiChatWidgetProps) {
                     )}
                     <span
                       className={`text-[9px] block mt-1 text-right ${
-                        m.role === "user" ? "text-indigo-200" : "text-slate-400 dark:text-slate-500"
+                        m.role === "user" ? "text-emerald-200" : "text-slate-400 dark:text-slate-500"
                       }`}
                     >
                       {m.createdAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
@@ -292,10 +292,10 @@ export default function AiChatWidget({ token, language }: AiChatWidgetProps) {
 
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-indigo-500 dark:bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                    <span className="w-1.5 h-1.5 bg-indigo-500 dark:bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                    <span className="w-1.5 h-1.5 bg-indigo-500 dark:bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200/40 dark:border-slate-800 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 bg-emerald-500 dark:bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <span className="w-1.5 h-1.5 bg-emerald-500 dark:bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <span className="w-1.5 h-1.5 bg-emerald-500 dark:bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                   </div>
                 </div>
               )}
@@ -314,7 +314,7 @@ export default function AiChatWidget({ token, language }: AiChatWidgetProps) {
                       key={i}
                       id={`suggested-prompt-btn-${i}`}
                       onClick={() => handleSendMessage(s)}
-                      className="text-left text-[11px] font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 dark:hover:bg-slate-850 hover:text-indigo-600 dark:hover:text-indigo-400 px-3 py-1.5 rounded-xl border border-slate-200/30 dark:border-slate-800/40 transition-all cursor-pointer truncate"
+                      className="text-left text-[11px] font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 dark:hover:bg-slate-850 hover:text-emerald-600 dark:hover:text-emerald-400 px-3 py-1.5 rounded-xl border border-slate-200/30 dark:border-slate-800/40 transition-all cursor-pointer truncate"
                     >
                       💡 {s}
                     </button>
@@ -339,7 +339,7 @@ export default function AiChatWidget({ token, language }: AiChatWidgetProps) {
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder={language === "id" ? "Tanyakan sesuatu..." : "Ask me anything..."}
                 disabled={isLoading}
-                className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-slate-800 dark:text-slate-100 transition-colors placeholder-slate-400"
+                className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-2xl px-4 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-800 dark:text-slate-100 transition-colors placeholder-slate-400"
               />
               <button
                 id="ai-chat-submit-btn"
@@ -347,7 +347,7 @@ export default function AiChatWidget({ token, language }: AiChatWidgetProps) {
                 disabled={!inputValue.trim() || isLoading}
                 className={`p-2.5 rounded-2xl font-bold flex items-center justify-center transition-all cursor-pointer ${
                   inputValue.trim() && !isLoading
-                    ? "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-lg shadow-indigo-500/20"
+                    ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/10 hover:shadow-emerald-600/25"
                     : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed"
                 }`}
               >
@@ -364,10 +364,10 @@ export default function AiChatWidget({ token, language }: AiChatWidgetProps) {
         onClick={isOpen ? () => setIsOpen(false) : handleOpenWidget}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className={`w-14 h-14 rounded-full flex items-center justify-center elevation-3 cursor-pointer relative transition-all border ${
+        className={`w-14 h-14 rounded-full flex items-center justify-center shadow-xl cursor-pointer relative transition-all border ${
           isOpen
             ? "bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-850"
-            : "bg-gradient-to-tr from-indigo-600 via-indigo-600 to-purple-600 border-indigo-500 text-white hover:from-indigo-500 hover:to-purple-500 shadow-indigo-600/20"
+            : "bg-gradient-to-tr from-emerald-600 via-emerald-600 to-teal-500 border-emerald-500 text-white hover:from-emerald-700 hover:to-teal-600 shadow-emerald-600/20"
         }`}
         title="Asisten AI Dayly"
       >
