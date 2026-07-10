@@ -81,7 +81,8 @@ export default function Dashboard({ token, user, onLogout, onUserUpdate }: Dashb
 
   // Mascot Interactive companion state
   const [petCount, setPetCount] = useState<number>(() => {
-    const stored = localStorage.getItem("dayly_mascot_pets");
+    // Gunakan user.id untuk memastikan jumlah pet terpisah per akun
+    const stored = localStorage.getItem(`dayly_mascot_pets_${user.id}`);
     return stored ? parseInt(stored, 10) : 0;
   });
   const [selectedCategory, setSelectedCategory] = useState<"Semua" | "Pekerjaan" | "Belajar" | "Kesehatan" | "Rumah">("Semua");
@@ -268,7 +269,7 @@ export default function Dashboard({ token, user, onLogout, onUserUpdate }: Dashb
     const newLevel = Math.floor(newCount / 5) + 1;
     
     setPetCount(newCount);
-    localStorage.setItem("dayly_mascot_pets", newCount.toString());
+    localStorage.setItem(`dayly_mascot_pets_${user.id}`, newCount.toString());
 
     if (newLevel > oldLevel) {
       // Trigger level-up celebration!
