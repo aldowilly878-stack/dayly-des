@@ -1,4 +1,5 @@
 import express from "express";
+import "dotenv/config";
 import { GoogleGenAI } from "@google/genai";
 import { createClient } from "@supabase/supabase-js";
 
@@ -440,7 +441,7 @@ app.post("/api/ai/chat", authMiddleware, async (req: any, res) => {
     }
 
     const response = await client.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-2.5-flash",
       contents: messages.map((m: any) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.text }] })),
       config: { systemInstruction: `Anda asisten untuk ${user?.fullName || username}.` },
     });
