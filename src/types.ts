@@ -14,6 +14,7 @@ export interface User {
 
 export type ActivityCategory = 'Pekerjaan' | 'Belajar' | 'Kesehatan' | 'Rumah' | 'Lainnya';
 export type ActivityPriority = 'Tinggi' | 'Sedang' | 'Rendah';
+export type ActivityStatus = 'idle' | 'running' | 'paused' | 'completed';
 
 export interface Activity {
   id: string;
@@ -25,6 +26,8 @@ export interface Activity {
   startTime: string; // HH:MM or YYYY-MM-DDTHH:MM
   endTime: string; // HH:MM or YYYY-MM-DDTHH:MM
   isCompleted: boolean;
+  status: ActivityStatus;
+  elapsedTime: number; // in seconds
   createdAt: string;
 }
 

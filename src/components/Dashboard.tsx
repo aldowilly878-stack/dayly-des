@@ -26,9 +26,11 @@ import {
   BookOpen,
   Heart,
   Home,
+  Play,
+  Pause,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { Activity, ActivityCategory, ActivityPriority, User } from "../types";
+import { Activity, ActivityCategory, ActivityPriority, User, ActivityStatus } from "../types";
 import StatsSection from "./StatsSection";
 import PomodoroTimer from "./PomodoroTimer";
 import AiAdvisor from "./AiAdvisor";
@@ -78,6 +80,24 @@ export default function Dashboard({ token, user, onLogout, onUserUpdate }: Dashb
 
   // Celebration Popup State
   const [completedActivityPopup, setCompletedActivityPopup] = useState<Activity | null>(null);
+
+  // Timer & Status Modals
+  const [pauseConfirmModal, setPauseConfirmModal] = useState<Activity | null>(null);
+
+  // Active interval for running activities
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActivities((prev) =>
+        prev.map((act) => {
+          if (act.status === "running") {
+            return { ...act, elapsedTime: (act.elapsedTime || 0) + 1 };
+          }
+          return act;
+        })
+      );
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Mascot Interactive companion state
   const [petCount, setPetCount] = useState<number>(() => {
@@ -316,27 +336,31 @@ export default function Dashboard({ token, user, onLogout, onUserUpdate }: Dashb
     fetchActivities();
   }, [token]);
 
-  // Handle Complete Toggle
-  const handleToggleComplete = async (activity: Activity) => {
+  // Handle Update Status
+  const handleUpdateStatus = async (activity: Activity, newStatus: ActivityStatus) => {
     try {
-      const updatedStatus = !activity.isCompleted;
+      const isCompleted = newStatus === 'completed';
       const response = await fetch(`/api/activities/${activity.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ isCompleted: updatedStatus }),
+        body: JSON.stringify({ 
+          status: newStatus, 
+          isCompleted,
+          elapsedTime: activity.elapsedTime || 0
+        }),
       });
 
       const result = await response.json();
       if (response.ok && result.success) {
-        // Optimistically update or re-fetch
+        // Optimistically update
         setActivities((prev) =>
-          prev.map((act) => (act.id === activity.id ? { ...act, isCompleted: updatedStatus } : act))
+          prev.map((act) => (act.id === activity.id ? { ...act, status: newStatus, isCompleted } : act))
         );
-        // Show celebration popup only when completing an activity (changing from incomplete to complete)
-        if (updatedStatus) {
+        // Show celebration popup only when completing
+        if (isCompleted && activity.status !== 'completed') {
           setCompletedActivityPopup(activity);
         }
       } else {
@@ -344,9 +368,14 @@ export default function Dashboard({ token, user, onLogout, onUserUpdate }: Dashb
       }
     } catch (err: any) {
       console.error("Gagal mengubah status aktivitas:", err);
-      // Re-fetch to synchronize state
       fetchActivities();
     }
+  };
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
   // Handle Add / Edit Submit
@@ -807,7 +836,7 @@ export default function Dashboard({ token, user, onLogout, onUserUpdate }: Dashb
                               {/* Complete Checkbox */}
                               <button
                                 id={`checkbox-${act.id}`}
-                                onClick={() => handleToggleComplete(act)}
+                                onClick={() => handleUpdateStatus(act, act.isCompleted ? 'idle' : 'completed')}
                                 className={`w-6 h-6 rounded-xl border-2 flex items-center justify-center cursor-pointer transition-all shrink-0 mt-0.5 ${
                                   act.isCompleted
                                     ? "bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-500/20"
@@ -841,6 +870,15 @@ export default function Dashboard({ token, user, onLogout, onUserUpdate }: Dashb
                                       <span>
                                         {act.startTime || "--:--"} {language === "id" ? "s/d" : "to"} {act.endTime || "--:--"}
                                       </span>
+                                    </div>
+                                  )}
+
+                                  {/* Real-time Timer Display */}
+                                  {!act.isCompleted && (
+                                    <div className={`flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-lg border-2 ${act.status === 'running' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-slate-50 text-slate-500 border-slate-200'}`}>
+                                      <Clock className="w-3 h-3" />
+                                      <span className="font-mono">{formatTime(act.elapsedTime || 0)}</span>
+                                      {act.status === 'running' && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse ml-1" />}
                                     </div>
                                   )}
                                 </div>
@@ -889,6 +927,25 @@ export default function Dashboard({ token, user, onLogout, onUserUpdate }: Dashb
                                 </div>
                               ) : (
                                 <>
+                                  {!act.isCompleted && (
+                                    act.status === 'running' ? (
+                                      <button
+                                        onClick={() => setPauseConfirmModal(act)}
+                                        className="p-2 text-amber-500 hover:text-white hover:bg-amber-500 rounded-xl border border-amber-500/30 hover:border-transparent transition-all cursor-pointer shadow-sm shadow-amber-500/10"
+                                        title={language === "id" ? "Jeda" : "Pause"}
+                                      >
+                                        <Pause className="w-4 h-4 fill-current" />
+                                      </button>
+                                    ) : (
+                                      <button
+                                        onClick={() => handleUpdateStatus(act, 'running')}
+                                        className="p-2 text-emerald-500 hover:text-white hover:bg-emerald-500 rounded-xl border border-emerald-500/30 hover:border-transparent transition-all cursor-pointer shadow-sm shadow-emerald-500/10"
+                                        title={language === "id" ? "Mulai" : "Start"}
+                                      >
+                                        <Play className="w-4 h-4 fill-current ml-0.5" />
+                                      </button>
+                                    )
+                                  )}
                                   <button
                                     id={`edit-btn-${act.id}`}
                                     onClick={() => {
@@ -1130,9 +1187,62 @@ export default function Dashboard({ token, user, onLogout, onUserUpdate }: Dashb
                   <AiAdvisor token={token} activitiesCount={activities.length} language={language} />
                 </div>
               </div>
-            </div>
-          </main>
+              {/* Pause Confirm Modal */}
+        <AnimatePresence>
+          {pauseConfirmModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-slate-900/40 backdrop-blur-sm"
+            >
+              <motion.div
+                initial={{ scale: 0.9, y: 20 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.9, y: 20 }}
+                className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-slate-200 dark:border-slate-800"
+              >
+                <div className="flex items-center gap-3 text-amber-500 mb-4">
+                  <div className="p-2.5 bg-amber-50 dark:bg-amber-500/10 rounded-xl">
+                    <Pause className="w-6 h-6 fill-amber-500" />
+                  </div>
+                  <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg">
+                    {language === "id" ? "Jeda Aktivitas" : "Pause Activity"}
+                  </h3>
+                </div>
+                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-6 leading-relaxed">
+                  {language === "id" 
+                    ? "Apakah aktivitas ini sudah selesai dikerjakan, atau hanya ingin dijeda sementara?" 
+                    : "Is this activity completed, or do you just want to pause it for a while?"}
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={() => {
+                      handleUpdateStatus(pauseConfirmModal, 'paused');
+                      setPauseConfirmModal(null);
+                    }}
+                    className="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-sm rounded-xl transition-all cursor-pointer"
+                  >
+                    {language === "id" ? "Jeda Saja" : "Just Pause"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleUpdateStatus(pauseConfirmModal, 'completed');
+                      setPauseConfirmModal(null);
+                    }}
+                    className="flex-1 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    {language === "id" ? "Sudah Selesai!" : "Completed!"}
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
+      </div>
+    </main>
       {/* Floating Modal for Add / Edit Activities */}
       {isModalOpen && (
         <ActivityFormModal

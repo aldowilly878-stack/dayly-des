@@ -283,6 +283,8 @@ app.post("/api/activities", authMiddleware, async (req: any, res) => {
       startTime: startTime || "",
       endTime: endTime || "",
       isCompleted: false,
+      status: 'idle',
+      elapsedTime: 0,
       createdAt: new Date().toISOString(),
     };
 
@@ -326,6 +328,36 @@ app.put("/api/activities/:id", authMiddleware, async (req: any, res) => {
 
     if (error || !activity) {
       return res.status(404).json({ success: false, message: "Gagal memperbarui aktivitas: " + (error?.message || "Tidak ditemukan.") });
+    }
+
+    res.json({ success: true, data: activity });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: `Gagal memperbarui aktivitas: ${error.message}` });
+  }
+});
+
+// CRUD: Update Activity
+app.put("/api/activities/:id", authMiddleware, async (req: any, res) => {
+  const { userId } = req.user;
+  const { id } = req.params;
+  const { isCompleted, status, elapsedTime } = req.body;
+
+  try {
+    const updates: any = {};
+    if (isCompleted !== undefined) updates.isCompleted = isCompleted;
+    if (status !== undefined) updates.status = status;
+    if (elapsedTime !== undefined) updates.elapsedTime = elapsedTime;
+
+    const { data: activity, error } = await supabase
+      .from('activities')
+      .update(updates)
+      .eq('id', id)
+      .eq('userId', userId)
+      .select()
+      .single();
+
+    if (error) {
+      return res.status(500).json({ success: false, message: `Gagal memperbarui aktivitas: ${error.message}` });
     }
 
     res.json({ success: true, data: activity });
