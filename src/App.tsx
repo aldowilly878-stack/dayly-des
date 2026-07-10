@@ -68,6 +68,7 @@ export default function App() {
 
   const handleLogout = () => {
     localStorage.removeItem("auth_token");
+    localStorage.removeItem("dayly_mascot_pets");
     setToken(null);
     setUser(null);
     document.documentElement.classList.add("dark");
