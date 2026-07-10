@@ -57,10 +57,10 @@ export default function AiAdvisor({ token, activitiesCount, language }: AiAdviso
         return <h4 key={idx} className="font-bold text-slate-800 dark:text-slate-200 text-xs mt-3 mb-1 uppercase tracking-wider">{line.replace("### ", "")}</h4>;
       }
       if (line.startsWith("## ")) {
-        return <h3 key={idx} className="font-bold text-emerald-700 dark:text-emerald-400 text-sm mt-4 mb-2 border-b border-emerald-100 dark:border-emerald-950 pb-1">{line.replace("## ", "")}</h3>;
+        return <h3 key={idx} className="font-bold text-indigo-700 dark:text-indigo-400 text-sm mt-4 mb-2 border-b border-indigo-100 dark:border-indigo-950 pb-1">{line.replace("## ", "")}</h3>;
       }
       if (line.startsWith("# ")) {
-        return <h2 key={idx} className="font-extrabold text-emerald-800 dark:text-emerald-300 text-base mt-4 mb-2">{line.replace("# ", "")}</h2>;
+        return <h2 key={idx} className="font-extrabold text-indigo-800 dark:text-indigo-300 text-base mt-4 mb-2">{line.replace("# ", "")}</h2>;
       }
       // Check for lists
       if (line.trim().startsWith("- ") || line.trim().startsWith("* ")) {
@@ -92,14 +92,14 @@ export default function AiAdvisor({ token, activitiesCount, language }: AiAdviso
   };
 
   return (
-    <div id="ai-advisor-card" className="bg-gradient-to-br from-emerald-50/80 via-white to-teal-50/50 dark:from-emerald-950/10 dark:via-slate-900 dark:to-teal-950/10 rounded-3xl border border-emerald-100/50 dark:border-slate-800/80 p-6 shadow-sm relative overflow-hidden transition-colors duration-300">
+    <div id="ai-advisor-card" className="bg-gradient-to-br from-indigo-50/80 via-white to-purple-50/50 dark:from-indigo-950/20 dark:via-slate-900 dark:to-purple-950/20 rounded-2xl border border-indigo-100/50 dark:border-slate-800 p-6 elevation-2 relative overflow-hidden transition-colors duration-300">
       {/* Decorative ambient blobs */}
-      <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-200/20 rounded-full blur-2xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-16 h-16 bg-teal-200/20 rounded-full blur-xl pointer-events-none" />
+      <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-200/30 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-16 h-16 bg-purple-200/30 rounded-full blur-xl pointer-events-none" />
 
       <div className="flex items-center justify-between mb-4 relative z-10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white border border-emerald-100 dark:border-slate-850 rounded-xl overflow-hidden shadow-sm flex items-center justify-center">
+          <div className="w-10 h-10 bg-white border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden elevation-1 flex items-center justify-center">
             <img src={mascotImg} alt="Mascot" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
           </div>
           <div>
@@ -115,7 +115,7 @@ export default function AiAdvisor({ token, activitiesCount, language }: AiAdviso
           id="refresh-ai-btn"
           disabled={loading}
           onClick={fetchAdvice}
-          className="p-1.5 rounded-xl border border-emerald-200 dark:border-slate-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-800 transition-all disabled:opacity-50 cursor-pointer"
+          className="p-1.5 rounded-xl border border-indigo-200 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-all disabled:opacity-50 cursor-pointer"
           title={t.aiRefreshTooltip}
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
@@ -145,7 +145,7 @@ export default function AiAdvisor({ token, activitiesCount, language }: AiAdviso
         )}
       </div>
 
-      <div className="mt-4 pt-3 border-t border-emerald-50 dark:border-slate-800/80 flex items-center gap-2 text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
+      <div className="mt-4 pt-3 border-t border-indigo-50 dark:border-slate-800 flex items-center gap-2 text-[10px] text-indigo-600 dark:text-indigo-400 font-bold">
         <CheckCircle className="w-3.5 h-3.5" />
         <span>{t.aiFooterText}</span>
       </div>

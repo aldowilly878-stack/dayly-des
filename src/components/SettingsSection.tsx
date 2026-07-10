@@ -73,9 +73,9 @@ export default function SettingsSection({
   };
 
   return (
-    <div id="settings-section-card" className="bg-white dark:bg-slate-900 border border-emerald-100/50 dark:border-slate-850 rounded-3xl p-6 shadow-sm transition-all duration-300 max-w-2xl mx-auto">
+    <div id="settings-section-card" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 elevation-2 transition-all duration-300 max-w-2xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-500 rounded-xl">
+        <div className="p-2 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-500 rounded-xl">
           <Settings className="w-5 h-5" />
         </div>
         <div>
@@ -96,8 +96,8 @@ export default function SettingsSection({
         </div>
       )}
       {success && (
-        <div className="mb-5 p-3.5 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 text-xs rounded-xl border border-emerald-100 dark:border-emerald-900/40 flex items-center gap-2">
-          <Check className="w-4 h-4 text-emerald-500 stroke-[3]" />
+        <div className="mb-5 p-3.5 bg-indigo-50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-400 text-xs rounded-xl border border-indigo-100 dark:border-indigo-900/40 flex items-center gap-2">
+          <Check className="w-4 h-4 text-indigo-500 stroke-[3]" />
           <span>{success}</span>
         </div>
       )}
@@ -106,7 +106,7 @@ export default function SettingsSection({
         {/* Language Selection */}
         <div className="space-y-3">
           <h4 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-2">
-            <Globe className="w-4 h-4 text-emerald-500" />
+            <Globe className="w-4 h-4 text-indigo-500" />
             <span>{t.settingsLanguage}</span>
           </h4>
           
@@ -117,7 +117,7 @@ export default function SettingsSection({
               onClick={() => setSelectedLang("id")}
               className={`flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer ${
                 selectedLang === "id"
-                  ? "bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-semibold shadow-sm"
+                  ? "bg-indigo-50/50 dark:bg-indigo-950/20 border-indigo-500 text-indigo-600 dark:text-indigo-400 font-semibold shadow-sm"
                   : "bg-slate-50 dark:bg-slate-950 border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100/50"
               }`}
             >
@@ -125,7 +125,7 @@ export default function SettingsSection({
                 <span className="text-xl">🇮🇩</span>
                 <span className="text-xs font-semibold">Bahasa Indonesia</span>
               </div>
-              {selectedLang === "id" && <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 stroke-[3]" />}
+              {selectedLang === "id" && <Check className="w-4 h-4 text-indigo-600 dark:text-indigo-400 stroke-[3]" />}
             </button>
 
             {/* English */}
@@ -134,7 +134,7 @@ export default function SettingsSection({
               onClick={() => setSelectedLang("en")}
               className={`flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer ${
                 selectedLang === "en"
-                  ? "bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-semibold shadow-sm"
+                  ? "bg-indigo-50/50 dark:bg-indigo-950/20 border-indigo-500 text-indigo-600 dark:text-indigo-400 font-semibold shadow-sm"
                   : "bg-slate-50 dark:bg-slate-950 border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100/50"
               }`}
             >
@@ -142,7 +142,7 @@ export default function SettingsSection({
                 <span className="text-xl">🇬🇧</span>
                 <span className="text-xs font-semibold">English</span>
               </div>
-              {selectedLang === "en" && <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 stroke-[3]" />}
+              {selectedLang === "en" && <Check className="w-4 h-4 text-indigo-600 dark:text-indigo-400 stroke-[3]" />}
             </button>
           </div>
         </div>
@@ -164,7 +164,7 @@ export default function SettingsSection({
               }}
               className={`flex flex-col items-center justify-center p-5 rounded-xl border transition-all cursor-pointer space-y-2.5 ${
                 selectedTheme === "light"
-                  ? "bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-semibold shadow-sm"
+                  ? "bg-indigo-50/50 dark:bg-indigo-950/20 border-indigo-500 text-indigo-600 dark:text-indigo-400 font-semibold shadow-sm"
                   : "bg-slate-50 dark:bg-slate-950 border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100/50"
               }`}
             >
@@ -172,7 +172,7 @@ export default function SettingsSection({
                 <Sun className="w-5 h-5 fill-amber-500" />
               </div>
               <span className="text-xs font-semibold">{t.settingsThemeLight}</span>
-              {selectedTheme === "light" && <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 stroke-[3]" />}
+              {selectedTheme === "light" && <Check className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 stroke-[3]" />}
             </button>
 
             {/* Dark Mode */}
@@ -184,15 +184,15 @@ export default function SettingsSection({
               }}
               className={`flex flex-col items-center justify-center p-5 rounded-xl border transition-all cursor-pointer space-y-2.5 ${
                 selectedTheme === "dark"
-                  ? "bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-semibold shadow-sm"
+                  ? "bg-indigo-50/50 dark:bg-indigo-950/20 border-indigo-500 text-indigo-600 dark:text-indigo-400 font-semibold shadow-sm"
                   : "bg-slate-50 dark:bg-slate-950 border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100/50"
               }`}
             >
-              <div className="p-2.5 bg-teal-50 dark:bg-teal-950/30 text-teal-500 rounded-full">
-                <Moon className="w-5 h-5 fill-teal-500 text-teal-500" />
+              <div className="p-2.5 bg-purple-50 dark:bg-purple-950/30 text-purple-500 rounded-full">
+                <Moon className="w-5 h-5 fill-purple-500 text-purple-500" />
               </div>
               <span className="text-xs font-semibold">{t.settingsThemeDark}</span>
-              {selectedTheme === "dark" && <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 stroke-[3]" />}
+              {selectedTheme === "dark" && <Check className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 stroke-[3]" />}
             </button>
           </div>
         </div>
@@ -203,7 +203,7 @@ export default function SettingsSection({
             id="save-settings-btn"
             onClick={handleSaveSettings}
             disabled={loading}
-            className="w-full sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+            className="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-500/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 active-press"
           >
             {loading ? (
               <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
