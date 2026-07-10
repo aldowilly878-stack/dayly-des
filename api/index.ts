@@ -12,8 +12,9 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: { persistSession: false },
 });
 
-// In-memory session validasi
-const activeSessions = new Map<string, { userId: string; username: string }>();
+import jwt from "jsonwebtoken";
+
+const JWT_SECRET = process.env.JWT_SECRET || "dayly-super-secret-key-2024";
 
 const authMiddleware = (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const authHeader = req.headers.authorization;
@@ -21,12 +22,13 @@ const authMiddleware = (req: express.Request, res: express.Response, next: expre
     return res.status(401).json({ success: false, message: "Akses ditolak. Token tidak disediakan." });
   }
   const token = authHeader.split(" ")[1];
-  const session = activeSessions.get(token);
-  if (!session) {
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    (req as any).user = decoded;
+    next();
+  } catch (error) {
     return res.status(401).json({ success: false, message: "Sesi kedaluwarsa atau tidak valid." });
   }
-  (req as any).user = session;
-  next();
 };
 
 let aiClient: GoogleGenAI | null = null;
@@ -124,8 +126,7 @@ app.post("/api/auth/login", async (req, res) => {
       return res.status(401).json({ success: false, message: "Username atau password salah." });
     }
 
-    const token = "tok-" + Math.random().toString(36).substr(2, 15) + Math.random().toString(36).substr(2, 15);
-    activeSessions.set(token, { userId: user.id, username: user.username });
+    const token = jwt.sign({ userId: user.id, username: user.username }, JWT_SECRET, { expiresIn: '7d' });
 
     res.json({
       success: true,
@@ -152,11 +153,7 @@ app.post("/api/auth/login", async (req, res) => {
 
 // Auth: Logout
 app.post("/api/auth/logout", (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    const token = authHeader.split(" ")[1];
-    activeSessions.delete(token);
-  }
+  // Untuk JWT, klien hanya perlu menghapus token dari penyimpanannya
   res.json({ success: true, message: "Berhasil keluar sesi." });
 });
 
@@ -167,8 +164,10 @@ app.get("/api/auth/session", async (req, res) => {
     return res.status(401).json({ success: false });
   }
   const token = authHeader.split(" ")[1];
-  const session = activeSessions.get(token);
-  if (!session) {
+  let decoded: any;
+  try {
+    decoded = jwt.verify(token, JWT_SECRET);
+  } catch (error) {
     return res.status(401).json({ success: false });
   }
   
@@ -176,7 +175,7 @@ app.get("/api/auth/session", async (req, res) => {
     const { data: user, error } = await supabase
       .from('users')
       .select('*')
-      .eq('id', session.userId)
+      .eq('id', decoded.userId)
       .single();
 
     if (error || !user) {
