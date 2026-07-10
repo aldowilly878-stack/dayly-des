@@ -291,9 +291,10 @@ export default function Dashboard({ token, user, onLogout, onUserUpdate }: Dashb
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/activities", {
+      const response = await fetch(`/api/activities?_t=${Date.now()}`, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Cache-Control": "no-cache",
         },
       });
       const result = await response.json();

@@ -245,6 +245,7 @@ app.put("/api/auth/profile", authMiddleware, async (req: any, res) => {
 // CRUD: Get Activities
 app.get("/api/activities", authMiddleware, async (req: any, res) => {
   const { userId } = req.user;
+  if (!userId) return res.status(401).json({ success: false, message: "Akses ditolak. Sesi tidak valid." });
   try {
     const { data: activities, error } = await supabase
       .from('activities')
