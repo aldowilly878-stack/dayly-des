@@ -217,6 +217,7 @@ app.put("/api/auth/profile", authMiddleware, async (req: any, res) => {
     if (theme !== undefined) updates.theme = theme;
     if (language !== undefined) updates.language = language;
     if (focusTarget !== undefined) updates.focusTarget = Number(focusTarget);
+    if (req.body.petCount !== undefined) updates.petCount = Number(req.body.petCount);
 
     const { data: user, error } = await supabase
       .from('users')

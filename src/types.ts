@@ -9,6 +9,7 @@ export interface User {
   theme?: "light" | "dark";
   language?: "id" | "en";
   focusTarget?: number; // target focus hours per day
+  petCount?: number;
 }
 
 export type ActivityCategory = 'Pekerjaan' | 'Belajar' | 'Kesehatan' | 'Rumah' | 'Lainnya';
